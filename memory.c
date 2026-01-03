@@ -27,13 +27,12 @@ void memory_init(void) {
     serial_puts("[mem] initialized\n");
 }
 
+
 void* alloc_stack(void) {
     stack_top -= STACKSIZE;
-
     serial_puts("[mem] stack alloc\n");
-    return (void*)stack_top;
+    return (void*)(stack_top + STACKSIZE);  // Return TOP, not bottom
 }
-
 void free_stack(void *addr) {
     stack_top = (uint32_t)addr;
 
