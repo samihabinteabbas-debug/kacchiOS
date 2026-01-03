@@ -45,4 +45,4 @@ void schedule(void) {
     current_proc = next;
     ctx_switch(prev, next);
 }
-}
+
