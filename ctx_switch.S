@@ -16,7 +16,7 @@ ctx_switch:
     movl 8(%ebp), %eax
     
     
-    mov1 %esp, (%eax)
+    movl %esp, (%eax)
     
     movl 12(%ebp), %eax
     
