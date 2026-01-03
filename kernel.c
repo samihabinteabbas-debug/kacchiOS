@@ -62,7 +62,7 @@ void kmain(void) {
                 input[pos++] = c;
                 serial_putc(c);  /* Echo character */
             }
-            schedule(); 
+            
         }
         
         /* Echo back the input */
@@ -72,6 +72,7 @@ void kmain(void) {
             serial_puts("\n");
         }
     }
+    schedule(); 
     
     /* Should never reach here */
     for (;;) {
