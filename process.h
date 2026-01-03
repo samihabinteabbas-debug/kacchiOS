@@ -30,14 +30,11 @@ typedef struct pcb {
     proc_state_t state;
     uint32_t priority;
     uint32_t age;
-
     void *stack_base;
-    void *stack_ptr;
-
+    uint32_t *stack_ptr;  // Change from void* to uint32_t*
     message_t msg_queue[MAX_MESSAGES];
     uint32_t msg_count;
 } pcb_t;
-
 /* Globals */
 extern pcb_t proc_table[MAX_PROCESSES];
 extern pcb_t *current_proc;
