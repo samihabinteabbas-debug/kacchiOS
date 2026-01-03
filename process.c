@@ -26,9 +26,26 @@ static uint32_t* init_stack(void *stack_top, void (*entry)(void)) {
     serial_putu((uint32_t)entry);
     serial_puts("\n");
     
-    *(--sp) = (uint32_t)entry; /* fake return address */
-    for (int i = 0; i < 8; i++) /* fake registers */
-        *(--sp) = 0;
+    /* Stack layout for ctx_switch to restore:
+     * - Return address (where to jump)
+     * - Saved ebp value (from "addl $4, %esp")
+     * - Flags (for popfl)
+     * - 8 general registers (for popal: edi, esi, ebp, esp, ebx, edx, ecx, eax)
+     */
+    
+    *(--sp) = (uint32_t)entry;  /* Return address */
+    *(--sp) = 0;                /* Saved ebp */
+    *(--sp) = 0x200;            /* EFLAGS (interrupts enabled) */
+    
+    /* Push dummy values for popal (8 registers) */
+    *(--sp) = 0;  /* EDI */
+    *(--sp) = 0;  /* ESI */
+    *(--sp) = 0;  /* EBP */
+    *(--sp) = 0;  /* ESP (ignored by popal) */
+    *(--sp) = 0;  /* EBX */
+    *(--sp) = 0;  /* EDX */
+    *(--sp) = 0;  /* ECX */
+    *(--sp) = 0;  /* EAX */
     
     serial_puts("[init_stack] final sp=");
     serial_putu((uint32_t)sp);
