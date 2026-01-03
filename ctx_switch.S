@@ -1,20 +1,14 @@
+/* ctx_switch.S - x86 context switch */
 .global ctx_switch
-.type ctx_switch, %function
 
-/* void ctx_switch(pcb_t *prev, pcb_t *next) */
-/* r0 = prev, r1 = next */
-
+/* void ctx_switch(uint32_t **old_sp, uint32_t *new_sp); */
 ctx_switch:
-    /* Save registers of current process */
-    push {r4-r11, lr}
+    pusha                   /* save registers */
 
-    /* Save SP into prev->stack_ptr */
-    str sp, [r0, #16]   /* offset of stack_ptr in pcb_t */
+    movl 8(%esp), %eax      /* eax = old_sp */
+    movl %esp, (%eax)       /* *old_sp = esp */
 
-    /* Load SP from next->stack_ptr */
-    ldr sp, [r1, #16]
+    movl 12(%esp), %esp     /* esp = new_sp */
 
-    /* Restore registers of next process */
-    pop {r4-r11, lr}
-
-    bx lr
+    popa                    /* restore registers */
+    ret
