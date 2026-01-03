@@ -6,7 +6,6 @@
 /* Scheduler */
 void schedule(void);
 
-/* Low-level context switch (ASM) */
-void ctx_switch(pcb_t *prev, pcb_t *next);
 
+void ctx_switch(uint32_t **old_sp, uint32_t **new_sp);
 #endif
