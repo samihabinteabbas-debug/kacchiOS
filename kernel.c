@@ -1,75 +1,67 @@
 /* kernel.c - Main kernel with null process */
-
 #include "types.h"
 #include "serial.h"
 #include "string.h"
 #include "process.h"
 #include "scheduler.h"
 #include "memory.h"
-
 #define MAX_INPUT 128
 
-void test_proc(void)
-{
-    while (1) {
-        serial_puts("[test] running\n");
-        for (volatile int i = 0; i < 10000000; i++);
-        schedule();   /* explicitly yield */
-    }
-}
-
-void kmain(void)
-{
+void kmain(void) {
     char input[MAX_INPUT];
-    int pos;
-
-    /* Initialize system */
+    int pos = 0;
+    
+    /* Initialize hardware */
     serial_init();
     memory_init();
     process_init();
 
-    /* Create one extra process to show rescheduling */
-    process_create(test_proc, 1);
-
-    /* Print banner ONCE */
+    /* Print welcome message */
     serial_puts("\n");
     serial_puts("========================================\n");
     serial_puts("    kacchiOS - Minimal Baremetal OS\n");
     serial_puts("========================================\n");
     serial_puts("Hello from kacchiOS!\n");
     serial_puts("Running null process...\n\n");
-
-    /* Null process loop */
+    
+    /* Main loop - the "null process" */
     while (1) {
+        schedule(); 
         serial_puts("kacchiOS> ");
         pos = 0;
-
-        /* Read input */
+        
+        /* Read input line */
         while (1) {
             char c = serial_getc();
-
+            
+            /* Handle Enter key */
             if (c == '\r' || c == '\n') {
                 input[pos] = '\0';
                 serial_puts("\n");
                 break;
             }
+            /* Handle Backspace */
             else if ((c == '\b' || c == 0x7F) && pos > 0) {
                 pos--;
-                serial_puts("\b \b");
+                serial_puts("\b \b");  /* Erase character on screen */
             }
+            /* Handle normal characters */
             else if (c >= 32 && c < 127 && pos < MAX_INPUT - 1) {
                 input[pos++] = c;
-                serial_putc(c);
+                serial_putc(c);  /* Echo character */
             }
         }
-
+        
+        /* Echo back the input */
         if (pos > 0) {
             serial_puts("You typed: ");
             serial_puts(input);
             serial_puts("\n");
         }
-
-        /* Yield CPU AFTER completing shell iteration */
-        schedule();
+    }
+    
+    /* Should never reach here */
+    for (;;) {
+        __asm__ volatile ("hlt");
     }
 }
