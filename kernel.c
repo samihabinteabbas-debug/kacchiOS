@@ -7,6 +7,15 @@
 #include "memory.h"
 #define MAX_INPUT 128
 
+void test_proc(void)
+{
+    while (1) {
+        serial_puts("[test] running\n");
+        for (volatile int i = 0; i < 10000000; i++);
+        schedule();
+    }
+}
+
 void kmain(void) {
     char input[MAX_INPUT];
     int pos = 0;
@@ -15,6 +24,9 @@ void kmain(void) {
     serial_init();
     memory_init();
     process_init();
+    extern void test_proc(void);
+
+    process_create(test_proc, 1);
 
     /* Print welcome message */
     serial_puts("\n");
