@@ -6,7 +6,7 @@ ctx_switch:
 
     pushl %ebp
     
-    mov1 %esp, %ebp
+    movl %esp, %ebp
     
     
     pushfl
