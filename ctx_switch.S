@@ -7,11 +7,11 @@ ctx_switch:
     movl 36(%esp), %eax        /* eax = old (4 + 32) */
     testl %eax, %eax           /* check if old is NULL */
     jz load_new                /* skip save if NULL */
-    movl %esp, (%eax)          /* old->esp = esp */
+    movl %esp, 20(%eax)        /* old->stack_ptr = esp (offset 20) */
 
 load_new:
     movl 40(%esp), %eax        /* eax = new (8 + 32) */
-    movl (%eax), %esp          /* esp = new->esp */
+    movl 20(%eax), %esp        /* esp = new->stack_ptr (offset 20) */
     
     popa                       /* restore registers */
     ret
