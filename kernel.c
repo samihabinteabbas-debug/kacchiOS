@@ -38,7 +38,7 @@ void kmain(void) {
     
     /* Main loop - the "null process" */
     while (1) {
-        schedule(); 
+        
         serial_puts("kacchiOS> ");
         pos = 0;
         
@@ -62,6 +62,7 @@ void kmain(void) {
                 input[pos++] = c;
                 serial_putc(c);  /* Echo character */
             }
+            schedule(); 
         }
         
         /* Echo back the input */
