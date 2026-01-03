@@ -1,14 +1,17 @@
 /* ctx_switch.S - x86 context switch */
 .global ctx_switch
-
-/* void ctx_switch(uint32_t **old_sp, uint32_t *new_sp); */
+/* void ctx_switch(pcb_t *old, pcb_t *new); */
 ctx_switch:
-    pusha                   /* save registers */
+    pusha                      /* save registers (32 bytes) */
+    
+    movl 36(%esp), %eax        /* eax = old (4 + 32) */
+    testl %eax, %eax           /* check if old is NULL */
+    jz load_new                /* skip save if NULL */
+    movl %esp, (%eax)          /* old->esp = esp */
 
-    movl 8(%esp), %eax      /* eax = old_sp */
-    movl %esp, (%eax)       /* *old_sp = esp */
-
-    movl 12(%esp), %esp     /* esp = new_sp */
-
-    popa                    /* restore registers */
+load_new:
+    movl 40(%esp), %eax        /* eax = new (8 + 32) */
+    movl (%eax), %esp          /* esp = new->esp */
+    
+    popa                       /* restore registers */
     ret
