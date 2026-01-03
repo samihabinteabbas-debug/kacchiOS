@@ -60,6 +60,7 @@ void kmain(void) {
             serial_puts(input);
             serial_puts("\n");
         }
+        schedule();
     }
     
     /* Should never reach here */
