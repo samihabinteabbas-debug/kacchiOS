@@ -1,7 +1,8 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include <stdint.h>
+#include "types.h"
+
 
 void memory_init(void);
 
