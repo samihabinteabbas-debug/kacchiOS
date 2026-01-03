@@ -17,21 +17,22 @@ static int find_free_slot(void) {
 }
 
 
-uint32_t* init_stack(void *stack_base, void (*entry)(void)) {
-    uint32_t *sp = (uint32_t*)stack_base;  // stack_base is now the top
+static uint32_t* init_stack(void *stack_top, void (*entry)(void)) {
+    uint32_t *sp = (uint32_t*)stack_top;
     
-    /* Push return address (where ret will jump to) */
-    *(--sp) = (uint32_t)entry;
+    serial_puts("[init_stack] stack_top=");
+    serial_putu((uint32_t)stack_top);
+    serial_puts(" entry=");
+    serial_putu((uint32_t)entry);
+    serial_puts("\n");
     
-    /* Push dummy values for popa (8 registers) */
-    *(--sp) = 0;  /* EDI */
-    *(--sp) = 0;  /* ESI */
-    *(--sp) = 0;  /* EBP */
-    *(--sp) = 0;  /* (ESP - ignored by popa) */
-    *(--sp) = 0;  /* EBX */
-    *(--sp) = 0;  /* EDX */
-    *(--sp) = 0;  /* ECX */
-    *(--sp) = 0;  /* EAX */
+    *(--sp) = (uint32_t)entry; /* fake return address */
+    for (int i = 0; i < 8; i++) /* fake registers */
+        *(--sp) = 0;
+    
+    serial_puts("[init_stack] final sp=");
+    serial_putu((uint32_t)sp);
+    serial_puts("\n");
     
     return sp;
 }
