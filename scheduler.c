@@ -41,12 +41,11 @@ void schedule(void) {
     
     pcb_t *prev = current_proc;
     current_proc = next;
-    
     if (prev) {
-        ctx_switch(&prev->stack_ptr, &next->stack_ptr);  // Pass ADDRESSES of stack_ptr fields
-    } else {
-        // First time switching - no previous context to save
-        uint32_t dummy;
-        ctx_switch(&dummy, &next->stack_ptr);
-    }
+    ctx_switch(&prev->stack_ptr, &next->stack_ptr);
+} else {
+    uint32_t *dummy = 0;  // Change to uint32_t*
+    ctx_switch(&dummy, &next->stack_ptr);
 }
+}
+
