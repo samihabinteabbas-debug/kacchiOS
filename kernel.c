@@ -6,6 +6,7 @@
 #include "scheduler.h"
 #include "memory.h"
 #define MAX_INPUT 128
+#include "processes.h"
 
 void kmain(void) {
     char input[MAX_INPUT];
