@@ -36,7 +36,7 @@ void schedule(void) {
     next->age = 0;
     
     serial_puts("[sched] switch to PID=");
-    serial_putu(next->pid);
+    
     serial_puts("\n");
     
     pcb_t *prev = current_proc;
