@@ -9,7 +9,7 @@ ASFLAGS = --32
 LDFLAGS = -m elf_i386
 
 OBJS = boot.o kernel.o serial.o string.o \
-       memory.o process.o scheduler.o ctx_switch.o
+       memory.o process.o scheduler.o ctx_switch.o processes.o
 
 
 all: kernel.elf
