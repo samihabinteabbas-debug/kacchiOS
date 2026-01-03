@@ -21,28 +21,32 @@ void schedule(void) {
     pcb_t *next = select_next();
     if (!next)
         return;
-
     if (current_proc == next)
         return;
-
+    
     /* Aging */
     for (int i = 0; i < MAX_PROCESSES; i++)
         if (proc_table[i].state == PROC_READY)
             proc_table[i].age++;
-
-    if (current_proc &&
-        current_proc->state == PROC_RUNNING)
+    
+    if (current_proc && current_proc->state == PROC_RUNNING)
         current_proc->state = PROC_READY;
-
+    
     next->state = PROC_RUNNING;
     next->age = 0;
-
+    
     serial_puts("[sched] switch to PID=");
     serial_putu(next->pid);
     serial_puts("\n");
-
+    
     pcb_t *prev = current_proc;
     current_proc = next;
-    ctx_switch(prev, next);
+    
+    if (prev) {
+        ctx_switch(&prev->stack_ptr, &next->stack_ptr);  // Pass ADDRESSES of stack_ptr fields
+    } else {
+        // First time switching - no previous context to save
+        uint32_t dummy;
+        ctx_switch(&dummy, &next->stack_ptr);
+    }
 }
-
