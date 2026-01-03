@@ -1,7 +1,8 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include <stdint.h>
+#include "types.h"
+
 
 #define MAX_PROCESSES 16
 #define MAX_MESSAGES  8
