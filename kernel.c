@@ -16,6 +16,8 @@ void kmain(void) {
     serial_init();
     memory_init();
     process_init();
+    process_create(procA, 3);
+    process_create(procB, 5);
 
     /* Print welcome message */
     serial_puts("\n");
