@@ -44,5 +44,10 @@ void schedule(void) {
     pcb_t *prev = current_proc;
     current_proc = next;
 
-    ctx_switch(prev, next);
+    // In scheduler.c, change ctx_switch call:
+if (prev) {
+    ctx_switch(&prev->stack_ptr, next->stack_ptr);
+} else {
+    ctx_switch(0, next->stack_ptr);
+}
 }
