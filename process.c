@@ -16,17 +16,25 @@ static int find_free_slot(void) {
     return -1;
 }
 
-static uint32_t* init_stack(void *stack_top, void (*entry)(void)) {
-    uint32_t *sp = (uint32_t*)stack_top;
 
-    *(--sp) = (uint32_t)entry; /* fake return address */
-
-    for (int i = 0; i < 8; i++) /* fake registers */
-        *(--sp) = 0;
-
+uint32_t* init_stack(void *stack_base, void (*entry)(void)) {
+    uint32_t *sp = (uint32_t*)stack_base;  // stack_base is now the top
+    
+    /* Push return address (where ret will jump to) */
+    *(--sp) = (uint32_t)entry;
+    
+    /* Push dummy values for popa (8 registers) */
+    *(--sp) = 0;  /* EDI */
+    *(--sp) = 0;  /* ESI */
+    *(--sp) = 0;  /* EBP */
+    *(--sp) = 0;  /* (ESP - ignored by popa) */
+    *(--sp) = 0;  /* EBX */
+    *(--sp) = 0;  /* EDX */
+    *(--sp) = 0;  /* ECX */
+    *(--sp) = 0;  /* EAX */
+    
     return sp;
 }
-
 /* ---------------- public API ---------------- */
 
 void process_init(void) {
