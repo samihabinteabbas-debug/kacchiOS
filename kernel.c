@@ -2,7 +2,9 @@
 #include "types.h"
 #include "serial.h"
 #include "string.h"
-
+#include "process.h"
+#include "scheduler.h"
+#include "memory.h"
 #define MAX_INPUT 128
 
 void kmain(void) {
@@ -11,7 +13,9 @@ void kmain(void) {
     
     /* Initialize hardware */
     serial_init();
-    
+    memory_init();
+    process_init();
+
     /* Print welcome message */
     serial_puts("\n");
     serial_puts("========================================\n");
@@ -22,6 +26,7 @@ void kmain(void) {
     
     /* Main loop - the "null process" */
     while (1) {
+        schedule(); 
         serial_puts("kacchiOS> ");
         pos = 0;
         
