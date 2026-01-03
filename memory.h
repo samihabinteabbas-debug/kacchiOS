@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+#define STACKSIZE 8192
 
 void memory_init(void);
 
