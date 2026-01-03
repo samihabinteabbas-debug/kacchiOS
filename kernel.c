@@ -29,7 +29,6 @@ void kmain(void) {
     
     /* Main loop - the "null process" */
     while (1) {
-        schedule(); 
         serial_puts("kacchiOS> ");
         pos = 0;
         
