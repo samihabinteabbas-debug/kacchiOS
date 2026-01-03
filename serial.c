@@ -49,6 +49,25 @@ void serial_puts(const char* str) {
         serial_putc(*str++);
     }
 }
+void serial_putu(unsigned int x)
+{
+    char buf[10];
+    int i = 0;
+
+    if (x == 0) {
+        serial_putc('0');
+        return;
+    }
+
+    while (x > 0) {
+        buf[i++] = '0' + (x % 10);
+        x /= 10;
+    }
+
+    while (i > 0) {
+        serial_putc(buf[--i]);
+    }
+}
 
 static int serial_received(void) {
     return inb(COM1 + 5) & 0x01;
