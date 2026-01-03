@@ -1,10 +1,12 @@
 #include "serial.h"
-
+#include "processes.h"
+#include "scheduler.h"
 void procA(void) {
     while (1) {
         serial_puts("A running...\n");
         for (volatile int i = 0; i < 1000000; i++);
     }
+    schedule();
 }
 
 void procB(void) {
@@ -12,4 +14,5 @@ void procB(void) {
         serial_puts("B running...\n");
         for (volatile int i = 0; i < 1000000; i++);
     }
+    schedule();
 }
