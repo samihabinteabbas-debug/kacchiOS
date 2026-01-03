@@ -28,7 +28,7 @@ void memory_init(void) {
 }
 
 void* alloc_stack(void) {
-    stack_top -= STACK_SIZE;
+    stack_top -= STACKSIZE;
 
     serial_puts("[mem] stack alloc\n");
     return (void*)stack_top;
