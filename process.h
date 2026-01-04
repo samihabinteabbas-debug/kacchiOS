@@ -26,10 +26,12 @@ typedef struct {
 
 /* Process Control Block */
 typedef struct pcb {
-    pid32 pid;                    /* PID == slot index */
+    pid32 pid;                   
     proc_state_t state;
     uint32_t priority;
     uint32_t age;
+    uint32_t time_slice;
+    uint32_t time_left;
 
     void *stack_base;
     uint32_t *stack_ptr;
