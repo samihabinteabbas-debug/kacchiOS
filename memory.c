@@ -8,6 +8,13 @@ typedef struct {
     int used;
 } stack_region_t;
 
+typedef struct memblk {
+    struct memblk *next;
+    uint32_t size;          // total size INCLUDING header
+} memblk_t;
+
+static memblk_t *freelist;
+
 #define MAX_STACKS 16
 
 static stack_region_t stack_table[MAX_STACKS];
@@ -58,13 +65,6 @@ void free_stack(void *addr) {
 
 
 /* ---------------- heap ---------------- */
-
-typedef struct memblk {
-    struct memblk *next;
-    uint32_t size;          // total size INCLUDING header
-} memblk_t;
-
-static memblk_t *freelist;
 
 /* Allocate heap memory */
 void* alloc_mem(uint32_t size) {
