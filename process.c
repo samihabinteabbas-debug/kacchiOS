@@ -138,7 +138,7 @@ void process_reap(void) {
     }
 }
 
-/* ---------------- IPC (non-blocking for now) ---------------- */
+/* ---------------- IPC  ---------------- */
 
 int process_send(pid32 dest_pid, uint32_t value) {
     if (!current_proc)
@@ -155,6 +155,11 @@ int process_send(pid32 dest_pid, uint32_t value) {
     dest->msg_queue[dest->msg_count].value = value;
     dest->msg_count++;
 
+    /* Wake up blocked receiver */
+    if (dest->state == PROC_BLOCKED) {
+        dest->state = PROC_READY;
+    }
+
     serial_puts("[ipc] send ");
     serial_putu(current_proc->pid);
     serial_puts(" -> ");
@@ -165,11 +170,22 @@ int process_send(pid32 dest_pid, uint32_t value) {
 }
 
 int process_receive(uint32_t *out_value) {
-    if (!current_proc || current_proc->msg_count == 0)
+    if (!current_proc)
         return -1;
+
+    /* No message → block */
+    if (current_proc->msg_count == 0) {
+        current_proc->state = PROC_BLOCKED;
+        schedule();          
+
+       
+        if (current_proc->msg_count == 0)
+            return -1;
+    }
 
     *out_value = current_proc->msg_queue[0].value;
 
+    /* Shift queue */
     for (uint32_t i = 1; i < current_proc->msg_count; i++)
         current_proc->msg_queue[i - 1] =
             current_proc->msg_queue[i];
@@ -182,3 +198,4 @@ int process_receive(uint32_t *out_value) {
 
     return 0;
 }
+
