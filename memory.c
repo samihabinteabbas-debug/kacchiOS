@@ -8,22 +8,11 @@ typedef struct {
     int used;
 } stack_region_t;
 
-#define MAX_STACKS MAX_PROCESSES
+#define MAX_STACKS 16
 
 static stack_region_t stack_table[MAX_STACKS];
 
 /* ---------------- stack ---------------- */
-
-static uint32_t stack_top;
-
-/* ---------------- heap ---------------- */
-
-typedef struct memblk {
-    struct memblk *next;
-    uint32_t size;
-} memblk_t;
-
-static memblk_t *freelist;
 
 void memory_init(void) {
     uint32_t addr = MEM_END;
@@ -40,7 +29,6 @@ void memory_init(void) {
 
     serial_puts("[mem] initialized\n");
 }
-
 void* alloc_stack(void) {
     for (int i = 0; i < MAX_STACKS; i++) {
         if (!stack_table[i].used) {
@@ -51,7 +39,6 @@ void* alloc_stack(void) {
     }
     return 0;  // no free stack
 }
-
 void free_stack(void *addr) {
     for (int i = 0; i < MAX_STACKS; i++) {
         uint32_t *top =
@@ -66,15 +53,17 @@ void free_stack(void *addr) {
 }
 
 
+
 /* ---------------- heap ---------------- */
 
 typedef struct memblk {
     struct memblk *next;
-    uint32_t size;          
+    uint32_t size;          // total size INCLUDING header
 } memblk_t;
 
 static memblk_t *freelist;
 
+/* Allocate heap memory */
 void* alloc_mem(uint32_t size) {
     memblk_t *prev = 0;
     memblk_t *curr = freelist;
@@ -115,7 +104,7 @@ void* alloc_mem(uint32_t size) {
         curr = curr->next;
     }
 
-    return 0;   
+    return 0;   // out of memory
 }
 
 /* Free heap memory with coalescing */
@@ -159,4 +148,3 @@ void free_mem(void *addr, uint32_t size) {
 
     serial_puts("[mem] heap free (coalesced)\n");
 }
-
