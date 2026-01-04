@@ -21,31 +21,44 @@ void schedule(void) {
     pcb_t *next = select_next();
     if (!next)
         return;
-    if (current_proc == next)
-        return;
-    
-    /* Aging */
-    for (int i = 0; i < MAX_PROCESSES; i++)
+
+    /* Aging for READY processes */
+    for (int i = 0; i < MAX_PROCESSES; i++) {
         if (proc_table[i].state == PROC_READY)
             proc_table[i].age++;
-    
-    if (current_proc && current_proc->state == PROC_RUNNING)
-        current_proc->state = PROC_READY;
-    
+    }
+
+    /* If current process still has time, keep running */
+    if (current_proc &&
+        current_proc->state == PROC_RUNNING &&
+        current_proc->time_left > 0) {
+
+        current_proc->time_left--;
+        return;
+    }
+
+    pcb_t *prev = current_proc;
+
+    if (prev && prev->state == PROC_RUNNING) {
+        prev->state = PROC_READY;
+        prev->time_left = prev->time_slice;
+    }
+
     next->state = PROC_RUNNING;
     next->age = 0;
-    
+    next->time_left = next->time_slice;
+
     serial_puts("[sched] switch to PID=");
-    
+    serial_putu(next->pid);
     serial_puts("\n");
-    
-    pcb_t *prev = current_proc;
+
     current_proc = next;
+
     if (prev) {
-    ctx_switch(&prev->stack_ptr, &next->stack_ptr);
-} else {
-    uint32_t *dummy = 0;  // Change to uint32_t*
-    ctx_switch(&dummy, &next->stack_ptr);
-}
+        ctx_switch(&prev->stack_ptr, &next->stack_ptr);
+    } else {
+        uint32_t *dummy = 0;
+        ctx_switch(&dummy, &next->stack_ptr);
+    }
 }
 
