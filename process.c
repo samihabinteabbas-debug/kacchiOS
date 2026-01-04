@@ -69,6 +69,8 @@ int process_create(void (*entry)(void), uint32_t priority) {
     p->state = PROC_READY;
     p->priority = priority;
     p->age = 0;
+    p->time_slice = 5;   
+    p->time_left  = p->time_slice;
 
     p->stack_base = stack;
     p->stack_ptr  = init_stack(stack, entry);
