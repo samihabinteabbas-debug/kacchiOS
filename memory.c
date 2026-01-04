@@ -29,6 +29,9 @@ void memory_init(void) {
 
     serial_puts("[mem] initialized\n");
 }
+
+
+
 void* alloc_stack(void) {
     for (int i = 0; i < MAX_STACKS; i++) {
         if (!stack_table[i].used) {
