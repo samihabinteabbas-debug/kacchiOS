@@ -16,27 +16,29 @@ static int find_free_slot(void) {
     return -1;
 }
 
-/* Initialize process stack so ctx_switch can restore it */
-static uint32_t* init_stack(void *stack_top, void (*entry)(void)) {
-    uint32_t *sp = (uint32_t*)stack_top;
+uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
+    uint32_t *sp;
 
-    /* Fake stack frame for ctx_switch */
-    *(--sp) = (uint32_t)entry;  /* return address */
-    *(--sp) = 0;                /* saved EBP */
-    *(--sp) = 0x200;            /* EFLAGS (IF=1) */
+    sp = (uint32_t *)stack_base;
 
-    /* popal restores these (EDI..EAX) */
-    *(--sp) = 0; /* EDI */
-    *(--sp) = 0; /* ESI */
-    *(--sp) = 0; /* EBP */
-    *(--sp) = 0; /* ESP (ignored) */
-    *(--sp) = 0; /* EBX */
-    *(--sp) = 0; /* EDX */
-    *(--sp) = 0; /* ECX */
-    *(--sp) = 0; /* EAX */
+    *--sp = (uint32_t)process_exit;
+
+    *--sp = (uint32_t)entry;
+
+    *--sp = 0x202;
+
+    *--sp = 0; /* EAX */
+    *--sp = 0; /* ECX */
+    *--sp = 0; /* EDX */
+    *--sp = 0; /* EBX */
+    *--sp = 0; /* ESP dummy */
+    *--sp = 0; /* EBP */
+    *--sp = 0; /* ESI */
+    *--sp = 0; /* EDI */
 
     return sp;
 }
+
 
 /* ---------------- public API ---------------- */
 
