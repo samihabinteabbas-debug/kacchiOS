@@ -24,35 +24,41 @@ static pcb_t* select_next(void) {
     return best;
 }
 void schedule(void) {
-    while (1) {  // Add back the outer loop!
-        pcb_t *next = select_next();
-        if (!next)
-            continue;  // Changed from return
-        
-        /* aging */
-        for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (proc_table[i].state == PROC_READY)
-                proc_table[i].age++;
-        }
-        
-        pcb_t *prev = current_proc;
-        
-        if (prev && prev->state == PROC_RUNNING)
-            prev->state = PROC_READY;
-        
-        next->state = PROC_RUNNING;
-        next->age = 0;
-        
-        serial_puts("[sched] switch to PID=");
-        serial_putu(next->pid);
-        serial_puts("\n");
-        
-        current_proc = next;
-        
-        if (prev == NULL) {
-            ctx_switch(NULL, &next->stack_ptr);
-        } else {
-            ctx_switch(&prev->stack_ptr, &next->stack_ptr);
-        }
+    pcb_t *next = select_next();
+    if (!next)
+        return;
+    
+    /* aging */
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (proc_table[i].state == PROC_READY)
+            proc_table[i].age++;
     }
+    
+    pcb_t *prev = current_proc;
+    
+    // Only switch if we're picking a DIFFERENT process
+    if (prev == next) {
+        return;  // Already running, no need to switch
+    }
+    
+    if (prev && prev->state == PROC_RUNNING)
+        prev->state = PROC_READY;
+    
+    next->state = PROC_RUNNING;
+    next->age = 0;
+    
+    serial_puts("[sched] switch to PID=");
+    serial_putu(next->pid);
+    serial_puts("\n");
+    
+    current_proc = next;
+    
+    if (prev == NULL) {
+        ctx_switch(NULL, &next->stack_ptr);
+    } else {
+        ctx_switch(&prev->stack_ptr, &next->stack_ptr);
+    }
+    
+    // When we return here, we've been switched back to
+    // We should return so the process can continue
 }
