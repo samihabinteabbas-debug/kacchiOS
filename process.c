@@ -19,35 +19,21 @@ static int find_free_slot(void) {
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
     uint32_t *sp = (uint32_t *)stack_base;
 
-    serial_puts("[init_stack] stack_base = 0x");
-    serial_puthex((uint32_t)stack_base);
-    serial_puts("\n");
-    serial_puts("[init_stack] entry = 0x");
-    serial_puthex((uint32_t)entry);
-    serial_puts("\n");
-
-    // Push in the order they'll be popped (REVERSE order)
-    *--sp = 0; /* EDI */
-    *--sp = 0; /* ESI */
-    *--sp = 0; /* EBP */
-    *--sp = 0; /* ESP */
-    *--sp = 0; /* EBX */
-    *--sp = 0; /* EDX */
-    *--sp = 0; /* ECX */
-    *--sp = 0; /* EAX */
-    *--sp = 0x202; /* EFLAGS */
-    *--sp = (uint32_t)entry; /* Return address */
-
-    serial_puts("[init_stack] final sp = 0x");
-    serial_puthex((uint32_t)sp);
-    serial_puts("\n");
+    // Push return address FIRST (it will be at highest address)
+    *--sp = (uint32_t)entry;
     
-    serial_puts("[init_stack] sp[0] = 0x");
-    serial_puthex(sp[0]);
-    serial_puts("\n");
-    serial_puts("[init_stack] sp[9] = 0x");
-    serial_puthex(sp[9]);
-    serial_puts("\n");
+    // Push EFLAGS
+    *--sp = 0x202;
+    
+    // Push registers (for popal) - in REVERSE of pop order
+    *--sp = 0; /* EAX - popal pops this last */
+    *--sp = 0; /* ECX */
+    *--sp = 0; /* EDX */
+    *--sp = 0; /* EBX */
+    *--sp = 0; /* ESP */
+    *--sp = 0; /* EBP */
+    *--sp = 0; /* ESI */
+    *--sp = 0; /* EDI - popal pops this first */
 
     return sp;
 }
