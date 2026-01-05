@@ -16,27 +16,27 @@ static int find_free_slot(void) {
     return -1;
 }
 
-
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
     uint32_t *sp = (uint32_t *)stack_base;
 
-    // Push entry point - this will be popped by 'ret'
-    *--sp = (uint32_t)entry;
+    // Push in the order they'll be popped (REVERSE order)
+    // Stack grows DOWN, so we push bottom-to-top of what we want
     
-    // Push EFLAGS (interrupts enabled)
-    *--sp = 0x202;
-
-    // Push registers in the order popal expects them
-    // popal pops: EDI, ESI, EBP, ESP(ignored), EBX, EDX, ECX, EAX
-    // So we push in REVERSE order:
-    *--sp = 0; /* EAX */
-    *--sp = 0; /* ECX */
-    *--sp = 0; /* EDX */
-    *--sp = 0; /* EBX */
-    *--sp = 0; /* ESP (ignored by popal) */
-    *--sp = 0; /* EBP */
+    // These will be popped by popal (in reverse order)
+    *--sp = 0; /* EDI - popped first by popal */
     *--sp = 0; /* ESI */
-    *--sp = 0; /* EDI */
+    *--sp = 0; /* EBP */
+    *--sp = 0; /* ESP */
+    *--sp = 0; /* EBX */
+    *--sp = 0; /* EDX */
+    *--sp = 0; /* ECX */
+    *--sp = 0; /* EAX - popped last by popal */
+    
+    // This will be popped by popfl
+    *--sp = 0x202; /* EFLAGS */
+    
+    // This will be popped by ret
+    *--sp = (uint32_t)entry; /* Return address */
 
     return sp;
 }
