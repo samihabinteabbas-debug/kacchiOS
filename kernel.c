@@ -15,7 +15,7 @@ extern void procC(void);
 extern void procD(void);
 
 /* -------------------------------------------------- */
-/* Null / Idle process                                */
+/* Idle process                                */
 /* -------------------------------------------------- */
 void null_process(void) {
     int idle_count = 0;
@@ -27,23 +27,6 @@ void null_process(void) {
             if (p && (p->state == PROC_READY || p->state == PROC_RUNNING || p->state == PROC_BLOCKED)) {
                 active_processes++;
             }
-        }
-        
-        /* If no active processes, we're done */
-        if (active_processes == 0) {
-            serial_puts("\n========================================\n");
-            serial_puts("  All processes completed!\n");
-            serial_puts("========================================\n");
-            serial_puts("\nkacchiOS demonstration finished.\n");
-            serial_puts("System halting.\n\n");
-               __asm__ volatile ("cli; hlt");
-    while (1) { __asm__ volatile ("hlt"); }
-        }
-        
-        /* Idle loop - print status occasionally */
-        idle_count++;
-        if (idle_count % 10 == 0) {
-            // Occasional status update
         }
         
         /* Small delay and yield */
@@ -65,7 +48,7 @@ void kmain(void) {
     /* Print banner */
     serial_puts("\n");
     serial_puts("========================================\n");
-    serial_puts("    kacchiOS - Educational OS Demo\n");
+    serial_puts("    kacchiOS - Extended\n");
     serial_puts("========================================\n");
     serial_puts("\nDemonstrating:\n");
     serial_puts("  - Process Management\n");
@@ -76,11 +59,6 @@ void kmain(void) {
     serial_puts("\n========================================\n");
     serial_puts("\nStarting demonstration...\n");
 
-    /*
-     * Create processes with different priorities
-     * Lower priority number = lower priority
-     * Higher priority number = higher priority
-     */
     process_create(null_process, 0);   /* PID 0: Idle process */
     process_create(procA, 3);           /* PID 1: Producer (medium priority) */
     process_create(procB, 5);           /* PID 2: Consumer (high priority) */
@@ -97,10 +75,6 @@ void kmain(void) {
     
     serial_puts("\nStarting scheduler...\n\n");
 
-    /*
-     * Start scheduling.
-     * This call NEVER returns.
-     */
     schedule();
 
     /* Safety net (should never reach here) */
