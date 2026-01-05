@@ -18,39 +18,34 @@ static pcb_t* select_next(void) {
     }
     return best;
 }
-
 void schedule(void) {
-    while (1) {
+    pcb_t *next = select_next();
+    if (!next)
+        return;  // No ready process
 
-        pcb_t *next = select_next();
-        if (!next)
-            continue;
+    /* aging */
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (proc_table[i].state == PROC_READY)
+            proc_table[i].age++;
+    }
 
-        /* aging */
-        for (int i = 0; i < MAX_PROCESSES; i++) {
-            if (proc_table[i].state == PROC_READY)
-                proc_table[i].age++;
-        }
+    pcb_t *prev = current_proc;
 
-        pcb_t *prev = current_proc;
+    if (prev && prev->state == PROC_RUNNING)
+        prev->state = PROC_READY;
 
-        if (prev && prev->state == PROC_RUNNING)
-            prev->state = PROC_READY;
+    next->state = PROC_RUNNING;
+    next->age = 0;
 
-        next->state = PROC_RUNNING;
-        next->age = 0;
+    serial_puts("[sched] switch to PID=");
+    serial_putu(next->pid);
+    serial_puts("\n");
 
-        serial_puts("[sched] switch to PID=");
-        serial_putu(next->pid);
-        serial_puts("\n");
+    current_proc = next;
 
-        current_proc = next;
-
-        if (prev == NULL) {
-            ctx_switch(NULL, &next->stack_ptr);
-        } else {
-            ctx_switch(&prev->stack_ptr, &next->stack_ptr);
-        }
-
+    if (prev == NULL) {
+        ctx_switch(NULL, &next->stack_ptr);
+    } else {
+        ctx_switch(&prev->stack_ptr, &next->stack_ptr);
     }
 }
