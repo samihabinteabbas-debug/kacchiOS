@@ -15,29 +15,26 @@ static int find_free_slot(void) {
     }
     return -1;
 }
-
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
     uint32_t *sp = (uint32_t *)stack_base;
-
-    // Push entry point as return address
+    // We push the entry point here
     *--sp = (uint32_t)entry;
-
-    // Push EFLAGS (with interrupts enabled)
+    
+    // Push EFLAGS (interrupts enabled)
     *--sp = 0x202;
 
-    // Push general-purpose registers (all zero initially)
-    *--sp = 0; /* EAX */
-    *--sp = 0; /* ECX */
-    *--sp = 0; /* EDX */
-    *--sp = 0; /* EBX */
-    *--sp = 0; /* ESP dummy */
-    *--sp = 0; /* EBP */
-    *--sp = 0; /* ESI */
+    // Push 8 general-purpose registers for popal
     *--sp = 0; /* EDI */
+    *--sp = 0; /* ESI */
+    *--sp = 0; /* EBP */
+    *--sp = 0; /* ESP (ignored by popal) */
+    *--sp = 0; /* EBX */
+    *--sp = 0; /* EDX */
+    *--sp = 0; /* ECX */
+    *--sp = 0; /* EAX */
 
     return sp;
 }
-
 
 /* ---------------- public API ---------------- */
 
