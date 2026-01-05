@@ -36,11 +36,8 @@ void null_process(void) {
             serial_puts("========================================\n");
             serial_puts("\nkacchiOS demonstration finished.\n");
             serial_puts("System halting.\n\n");
-            
-            /* Halt the system */
-            while(1) {
-                __asm__ volatile ("hlt");
-            }
+               __asm__ volatile ("cli; hlt");
+    while (1) { __asm__ volatile ("hlt"); }
         }
         
         /* Idle loop - print status occasionally */
