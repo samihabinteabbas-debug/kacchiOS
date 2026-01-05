@@ -23,7 +23,7 @@ void procA(void) {
         // Simulate work
         for (volatile int j = 0; j < 500000; j++);
         
-        schedule();  // Yield to other processes
+        schedule();
     }
     
     serial_puts("[ProcA] Producer finished - exiting\n");
@@ -48,7 +48,7 @@ void procB(void) {
             for (volatile int j = 0; j < 500000; j++);
         }
         
-        schedule();  // Yield to other processes
+        schedule(); 
     }
     
     serial_puts("[ProcB] Consumer finished - exiting\n");
@@ -78,9 +78,8 @@ void procC(void) {
         }
         serial_puts("\n");
         
-        schedule();  // Let others run
+        schedule(); 
         
-        // Read back and verify
         serial_puts("[ProcC] Verifying data: ");
         int correct = 1;
         for (int i = 0; i < 10; i++) {
@@ -89,13 +88,7 @@ void procC(void) {
                 break;
             }
         }
-        
-        if (correct) {
-            serial_puts("All correct!\n");
-        } else {
-            serial_puts("Data corruption detected!\n");
-        }
-        
+
         // Free memory
         serial_puts("[ProcC] Freeing memory...\n");
         free_mem(data, 128);
@@ -140,13 +133,13 @@ void procD(void) {
             }
         }
         
-        serial_puts("[ProcD] ========================\n\n");
+        serial_puts("[ProcD]\n\n");
         
-        // Wait a bit
+        // Wait 
         for (volatile int j = 0; j < 1000000; j++);
         schedule();
     }
     
-    serial_puts("[ProcD] Status reporter finished - exiting\n");
+    serial_puts("[ProcD] Status reporter finished\n");
     process_exit();
 }
