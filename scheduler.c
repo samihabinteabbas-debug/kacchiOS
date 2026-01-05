@@ -1,8 +1,10 @@
 #include "scheduler.h"
 #include "serial.h"
 
+pcb_t *current_proc = NULL;
+
 static pcb_t* select_next(void) {
-    pcb_t *best = 0;
+    pcb_t *best = NULL;
 
     for (int i = 0; i < MAX_PROCESSES; i++) {
         pcb_t *p = &proc_table[i];
@@ -21,11 +23,10 @@ void schedule(void) {
     while (1) {
 
         pcb_t *next = select_next();
-        if (!next) {
-            continue;   /* idle until something is READY */
-        }
+        if (!next)
+            continue;
 
-        /* Aging */
+        /* aging */
         for (int i = 0; i < MAX_PROCESSES; i++) {
             if (proc_table[i].state == PROC_READY)
                 proc_table[i].age++;
@@ -33,9 +34,8 @@ void schedule(void) {
 
         pcb_t *prev = current_proc;
 
-        if (prev && prev->state == PROC_RUNNING) {
+        if (prev && prev->state == PROC_RUNNING)
             prev->state = PROC_READY;
-        }
 
         next->state = PROC_RUNNING;
         next->age = 0;
@@ -46,14 +46,11 @@ void schedule(void) {
 
         current_proc = next;
 
-        if (prev) {
-            ctx_switch(&prev->stack_ptr, &next->stack_ptr);
+        if (prev == NULL) {
+            ctx_switch(NULL, &next->stack_ptr);
         } else {
-            uint32_t *dummy = 0;
-            ctx_switch(&dummy, &next->stack_ptr);
+            ctx_switch(&prev->stack_ptr, &next->stack_ptr);
         }
 
-        /* NEVER RETURNS HERE */
     }
 }
-
