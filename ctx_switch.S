@@ -2,17 +2,22 @@
 .global ctx_switch
 
 ctx_switch:
-    pushfl                   # Save EFLAGS
-    pushal                   # Save all registers
+    pushl %ebp
+    movl %esp, %ebp
     
-    movl 40(%esp), %eax      # Get &old_sp (first parameter)
+    pushfl
+    pushal
+    
+    movl 8(%ebp), %eax       # old_sp (first param)
     test %eax, %eax
     jz no_save
-    movl %esp, (%eax)        # Save current stack pointer
+    movl %esp, (%eax)
 no_save:
-    movl 44(%esp), %eax      # Get &new_sp (second parameter)
-    movl (%eax), %esp        # Load new stack pointer
-
-    popal                    # Restore registers
-    popfl                    # Restore EFLAGS
-    ret                      # Return to saved address
+    movl 12(%ebp), %eax      # new_sp (second param)
+    movl (%eax), %esp
+    
+    popal
+    popfl
+    
+    popl %ebp
+    ret
