@@ -7,12 +7,7 @@
 #include "scheduler.h"
 #include "memory.h"
 #include "processes.h"
-void serial_puthex(uint32_t val) {
-    char hex[] = "0123456789ABCDEF";
-    for (int i = 28; i >= 0; i -= 4) {
-        serial_putc(hex[(val >> i) & 0xF]);
-    }
-}
+
 /* -------------------------------------------------- */
 /* Null / Idle process                                */
 /* -------------------------------------------------- */
