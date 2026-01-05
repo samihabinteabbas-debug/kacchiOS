@@ -42,7 +42,9 @@ void schedule(void) {
     serial_puts("\n");
 
     current_proc = next;
-
+serial_puts("[sched] next->stack_ptr = 0x");
+serial_puthex((uint32_t)next->stack_ptr);
+serial_puts("\n");
     if (prev == NULL) {
         ctx_switch(NULL, &next->stack_ptr);
     } else {
