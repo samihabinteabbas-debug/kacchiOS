@@ -18,7 +18,7 @@ typedef enum {
     PROC_ZOMBIE
 } proc_state_t;
 
-/* IPC message (used later) */
+/* IPC message */
 typedef struct {
     pid32 sender_pid;
     uint32_t value;
@@ -58,7 +58,7 @@ pid32  process_current_pid(void);
 /* Cleanup */
 void process_reap(void);
 
-/* IPC (non-blocking for now) */
+/* IPC  */
 int process_send(pid32 dest_pid, uint32_t value);
 int process_receive(uint32_t *out_value);
 
