@@ -57,4 +57,5 @@ serial_puts("\n");
     } else {
         ctx_switch(&prev->stack_ptr, &next->stack_ptr);
     }
+    serial_puts("[sched] Back from ctx_switch\n");
 }
