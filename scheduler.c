@@ -2,12 +2,7 @@
 #include "serial.h"
 
 pcb_t *current_proc = NULL;
-void serial_puthex(uint32_t val) {
-    char hex[] = "0123456789ABCDEF";
-    for (int i = 28; i >= 0; i -= 4) {
-        serial_putc(hex[(val >> i) & 0xF]);
-    }
-}
+
 static pcb_t* select_next(void) {
     pcb_t *best = NULL;
 
@@ -36,9 +31,8 @@ void schedule(void) {
     
     pcb_t *prev = current_proc;
     
-    // Only switch if we're picking a DIFFERENT process
     if (prev == next) {
-        return;  // Already running, no need to switch
+        return; 
     }
     
     if (prev && prev->state == PROC_RUNNING)
@@ -58,7 +52,4 @@ void schedule(void) {
     } else {
         ctx_switch(&prev->stack_ptr, &next->stack_ptr);
     }
-    
-    // When we return here, we've been switched back to
-    // We should return so the process can continue
 }
