@@ -18,47 +18,42 @@ static pcb_t* select_next(void) {
 }
 
 void schedule(void) {
-    pcb_t *next = select_next();
-    if (!next)
-        return;
+    while (1) {
 
-    /* Aging for READY processes */
-    for (int i = 0; i < MAX_PROCESSES; i++) {
-        if (proc_table[i].state == PROC_READY)
-            proc_table[i].age++;
-    }
+        pcb_t *next = select_next();
+        if (!next) {
+            continue;   /* idle until something is READY */
+        }
 
-    /* If current process still has time, keep running */
-    if (current_proc &&
-        current_proc->state == PROC_RUNNING &&
-        current_proc->time_left > 0) {
+        /* Aging */
+        for (int i = 0; i < MAX_PROCESSES; i++) {
+            if (proc_table[i].state == PROC_READY)
+                proc_table[i].age++;
+        }
 
-        current_proc->time_left--;
-        return;
-    }
+        pcb_t *prev = current_proc;
 
-    pcb_t *prev = current_proc;
+        if (prev && prev->state == PROC_RUNNING) {
+            prev->state = PROC_READY;
+        }
 
-    if (prev && prev->state == PROC_RUNNING) {
-        prev->state = PROC_READY;
-        prev->time_left = prev->time_slice;
-    }
+        next->state = PROC_RUNNING;
+        next->age = 0;
 
-    next->state = PROC_RUNNING;
-    next->age = 0;
-    next->time_left = next->time_slice;
+        serial_puts("[sched] switch to PID=");
+        serial_putu(next->pid);
+        serial_puts("\n");
 
-    serial_puts("[sched] switch to PID=");
-    serial_putu(next->pid);
-    serial_puts("\n");
+        current_proc = next;
 
-    current_proc = next;
+        if (prev) {
+            ctx_switch(&prev->stack_ptr, &next->stack_ptr);
+        } else {
+            uint32_t *dummy = 0;
+            ctx_switch(&dummy, &next->stack_ptr);
+        }
 
-    if (prev) {
-        ctx_switch(&prev->stack_ptr, &next->stack_ptr);
-    } else {
-        uint32_t *dummy = 0;
-        ctx_switch(&dummy, &next->stack_ptr);
+        /* NEVER RETURNS HERE */
     }
 }
 
