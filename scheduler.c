@@ -2,7 +2,12 @@
 #include "serial.h"
 
 pcb_t *current_proc = NULL;
-
+void serial_puthex(uint32_t val) {
+    char hex[] = "0123456789ABCDEF";
+    for (int i = 28; i >= 0; i -= 4) {
+        serial_putc(hex[(val >> i) & 0xF]);
+    }
+}
 static pcb_t* select_next(void) {
     pcb_t *best = NULL;
 
