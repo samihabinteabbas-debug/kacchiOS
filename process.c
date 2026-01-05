@@ -17,16 +17,15 @@ static int find_free_slot(void) {
 }
 
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
-    uint32_t *sp;
+    uint32_t *sp = (uint32_t *)stack_base;
 
-    sp = (uint32_t *)stack_base;
-
-    *--sp = (uint32_t)process_exit;
-
+    // Push entry point as return address
     *--sp = (uint32_t)entry;
 
+    // Push EFLAGS (with interrupts enabled)
     *--sp = 0x202;
 
+    // Push general-purpose registers (all zero initially)
     *--sp = 0; /* EAX */
     *--sp = 0; /* ECX */
     *--sp = 0; /* EDX */
