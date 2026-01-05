@@ -19,24 +19,35 @@ static int find_free_slot(void) {
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
     uint32_t *sp = (uint32_t *)stack_base;
 
+    serial_puts("[init_stack] stack_base = 0x");
+    serial_puthex((uint32_t)stack_base);
+    serial_puts("\n");
+    serial_puts("[init_stack] entry = 0x");
+    serial_puthex((uint32_t)entry);
+    serial_puts("\n");
+
     // Push in the order they'll be popped (REVERSE order)
-    // Stack grows DOWN, so we push bottom-to-top of what we want
-    
-    // These will be popped by popal (in reverse order)
-    *--sp = 0; /* EDI - popped first by popal */
+    *--sp = 0; /* EDI */
     *--sp = 0; /* ESI */
     *--sp = 0; /* EBP */
     *--sp = 0; /* ESP */
     *--sp = 0; /* EBX */
     *--sp = 0; /* EDX */
     *--sp = 0; /* ECX */
-    *--sp = 0; /* EAX - popped last by popal */
-    
-    // This will be popped by popfl
+    *--sp = 0; /* EAX */
     *--sp = 0x202; /* EFLAGS */
-    
-    // This will be popped by ret
     *--sp = (uint32_t)entry; /* Return address */
+
+    serial_puts("[init_stack] final sp = 0x");
+    serial_puthex((uint32_t)sp);
+    serial_puts("\n");
+    
+    serial_puts("[init_stack] sp[0] = 0x");
+    serial_puthex(sp[0]);
+    serial_puts("\n");
+    serial_puts("[init_stack] sp[9] = 0x");
+    serial_puthex(sp[9]);
+    serial_puts("\n");
 
     return sp;
 }
