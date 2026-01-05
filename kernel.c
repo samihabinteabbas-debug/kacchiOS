@@ -13,11 +13,11 @@
 /* -------------------------------------------------- */
 void null_process(void) {
     while (1) {
-        /* Idle loop — give CPU to others */
+        /* add a small delay */
+        for (volatile int i = 0; i < 100000; i++);
         schedule();
     }
 }
-
 /* -------------------------------------------------- */
 /* Kernel entry point                                 */
 /* -------------------------------------------------- */
