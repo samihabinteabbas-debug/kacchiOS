@@ -1,8 +1,8 @@
 #include "memory.h"
 #include "serial.h"
 
-#define MEM_START 0x80000000
-#define MEM_END   0x80020000
+#define MEM_START 0x00110000  // Right after kernel code
+#define MEM_END   0x00200000  // 1MB of space
 typedef struct {
     void *base;
     int used;
