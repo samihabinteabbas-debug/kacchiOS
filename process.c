@@ -6,8 +6,6 @@
 pcb_t proc_table[MAX_PROCESSES];
 //pcb_t *current_proc = NULL;
 
-/* ---------------- internal helpers ---------------- */
-
 static int find_free_slot(void) {
     for (int i = 0; i < MAX_PROCESSES; i++) {
         if (proc_table[i].state == PROC_UNUSED)
@@ -37,7 +35,7 @@ uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
 
     return sp;
 }
-/* ---------------- public API ---------------- */
+
 
 void process_init(void) {
     for (int i = 0; i < MAX_PROCESSES; i++) {
