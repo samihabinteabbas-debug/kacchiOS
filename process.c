@@ -15,27 +15,31 @@ static int find_free_slot(void) {
     }
     return -1;
 }
+
+
 uint32_t *init_stack(void *stack_base, void (*entry)(void)) {
     uint32_t *sp = (uint32_t *)stack_base;
-    // We push the entry point here
+
+    // Push entry point - this will be popped by 'ret'
     *--sp = (uint32_t)entry;
     
     // Push EFLAGS (interrupts enabled)
     *--sp = 0x202;
 
-    // Push 8 general-purpose registers for popal
-    *--sp = 0; /* EDI */
-    *--sp = 0; /* ESI */
-    *--sp = 0; /* EBP */
-    *--sp = 0; /* ESP (ignored by popal) */
-    *--sp = 0; /* EBX */
-    *--sp = 0; /* EDX */
-    *--sp = 0; /* ECX */
+    // Push registers in the order popal expects them
+    // popal pops: EDI, ESI, EBP, ESP(ignored), EBX, EDX, ECX, EAX
+    // So we push in REVERSE order:
     *--sp = 0; /* EAX */
+    *--sp = 0; /* ECX */
+    *--sp = 0; /* EDX */
+    *--sp = 0; /* EBX */
+    *--sp = 0; /* ESP (ignored by popal) */
+    *--sp = 0; /* EBP */
+    *--sp = 0; /* ESI */
+    *--sp = 0; /* EDI */
 
     return sp;
 }
-
 /* ---------------- public API ---------------- */
 
 void process_init(void) {
