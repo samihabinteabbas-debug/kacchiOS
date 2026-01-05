@@ -4,7 +4,7 @@
 #include "scheduler.h"
 
 pcb_t proc_table[MAX_PROCESSES];
-pcb_t *current_proc = NULL;
+//pcb_t *current_proc = NULL;
 
 /* ---------------- internal helpers ---------------- */
 
