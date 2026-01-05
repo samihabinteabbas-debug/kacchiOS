@@ -45,7 +45,7 @@ serial_puthex((uint32_t)procA);
 serial_puts("\n");
     process_create(null_process, 0);   /* PID 0 : idle */
     process_create(procA, 3);           /* user process */
-    // process_create(procB, 5);
+    process_create(procB, 5);
 
     serial_puts("Starting scheduler...\n");
 
