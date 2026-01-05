@@ -50,6 +50,26 @@ void schedule(void) {
 serial_puts("[sched] next->stack_ptr = 0x");
 serial_puthex((uint32_t)next->stack_ptr);
 serial_puts("\n");
+    serial_puts("[sched] About to context switch\n");
+serial_puts("[sched] prev = 0x");
+serial_puthex((uint32_t)prev);
+serial_puts("\n");
+serial_puts("[sched] next = 0x");
+serial_puthex((uint32_t)next);
+serial_puts("\n");
+serial_puts("[sched] next->stack_ptr = 0x");
+serial_puthex((uint32_t)next->stack_ptr);
+serial_puts("\n");
+
+// Print what's at the top of the new stack
+uint32_t *sp = next->stack_ptr;
+for (int i = 0; i < 11; i++) {
+    serial_puts("[sched] sp[");
+    serial_putu(i);
+    serial_puts("] = 0x");
+    serial_puthex(sp[i]);
+    serial_puts("\n");
+}
     if (prev == NULL) {
         ctx_switch(NULL, &next->stack_ptr);
     } else {
